@@ -8,16 +8,13 @@
       "email": "support@viewone.pl"
     }
   ],
-  "require": {
-    "fabpot/pimple": "~3.0"
-  },
   "require-dev": {
     "phpspec/phpspec": "~2.0",
     "instaclick/php-code-sniffer": "~1.4",
     "sebastian/phpcpd": "~2.0",
-    "czproject/phpdepend": "~1.0",
+    "pdepend/pdepend": "~2.0",
     "phploc/phploc": "~2.0",
-    "phpmd/phpmd": "~1.5",
+    "phpmd/phpmd": "~2.0",
     "fabpot/php-cs-fixer": "~0.4"
   },
   "autoload": {
