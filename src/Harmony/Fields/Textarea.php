@@ -26,17 +26,18 @@ class Textarea extends Field
     /**
      * Form constructor
      *
-     * @param array $attributes Field attributes
+     * @param array $fieldData Field attributes
      *
      * @access public
      * @since Method available since Release 1.0.0
      */
-    public function __construct($attributes)
+    public function __construct($fieldData)
     {
-        $this->name = $attributes['name'];
-        $this->attributes = $attributes;
+        parent::__construct($fieldData);
 
-        $this->validate($this->value);
+        $this->partial  = "textarea";
+        $this->helper   = 'html';
+
     }
 
     /**

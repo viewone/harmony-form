@@ -18,6 +18,8 @@
 
 namespace Harmony;
 
+use Exception;
+
 abstract class Field
 {
 
@@ -29,13 +31,6 @@ abstract class Field
     protected $name;
 
     /**
-     * Field type
-     *
-     * @var string
-     */
-    protected $type;
-
-    /**
      * Field value
      *
      * @var string
@@ -43,53 +38,89 @@ abstract class Field
     protected $value;
 
     /**
-     * Field label
+     * Field data
      *
      * @var string
      */
-    protected $label;
+    protected $fieldData = array();
+
+    /**
+     * Field options
+     *
+     * @var string
+     */
+    protected $fieldOptions = array();
+
+    /**
+     * Field partial
+     *
+     * @var string
+     */
+    protected $partial;
+
+    /**
+     * Field helper
+     *
+     * @var string
+     */
+    protected $helper;
 
     /**
      * Field attributes
      *
      * @var array|object|instace of Field
      */
-    protected $attributes;
+    protected $fieldAttributes = array();
 
     /**
      * Field error messages
      *
      * @var array
      */
-    protected $errorMessage = array();
+    protected $errorMessages = array();
 
-    public function __construct(){
 
-        $this->label = $this->setLabel($this->attributes);
+    public function __construct($fieldData)
+    {
+        $this->fieldData = $fieldData;
+
+        if (isset($this->fieldData['options'])) {
+            $this->setFieldOptions($this->fieldData['options']);
+        }
+
+        if (isset($this->fieldData['options'])) {
+            $tempData = $this->fieldData;
+            unset($tempData['options']);
+            $this->setFieldAttributes($tempData);
+        }
 
     }
 
     /**
-     * Set Error
+     * Set Option
      *
-     * Adds an error message to an array of errors
+     * @param array $optionKey Field option key
+     * @param array $optionValue Field option value
      *
-     * @param string $message The content for error message
      *
      * @access public
      * @since Method available since Release 1.0.0
      * @return void
      */
 
-    public function setErrorMessage($message)
+    public function setFieldOption($optionKey, $optionValue)
     {
-        $this->custom_error[] = $message;
+
+            $this->fieldOptions[$optionKey] = $optionValue;
+
+
+        return $this;
     }
 
     /**
-     * Set label
+     * Get Options
      *
-     * @param string $attributes The label for a field
+     * @param string $name Option name
      *
      * @throws Exception
      *
@@ -98,32 +129,261 @@ abstract class Field
      * @return void
      */
 
-    public function setLabel($attributes)
+    public function getFieldOption($name)
     {
-        if(array_key_exists('label', $attributes)){
-            $this->label = $attributes['label'];
+        return $this->fieldOptions[$name];
+    }
+
+
+    /**
+     * Set Options
+     *
+     * @param array $options Field options
+     *
+     * @throws Exception
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setFieldOptions($options)
+    {
+        if (is_array($options)) {
+            $this->fieldOptions = $options;
         } else {
-            throw new Exception('Label property doesn`t exist');
+            throw new Exception('Options must be an array');
         }
 
+        return $this;
     }
 
     /**
-     * Get label
+     * Get Options
+     *
+     * @throws Exception
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function getFieldOptions()
+    {
+        return $this->fieldOptions;
+    }
+
+    /**
+     * Set Attributes
+     *
+     * @param array $attributes Field attributes
+     *
+     * @throws Exception
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setFieldAttributes($attributes)
+    {
+
+        if (is_array($attributes)) {
+                $this->fieldAttributes = $attributes;
+
+                foreach ($attributes as $key => $value) {
+                    $normalized = ucfirst($key);
+
+                    $method = 'set' . $normalized;
+                    if (method_exists($this, $method)) {
+                        $this->$method($value);
+                    }
+                }
+
+        } else {
+            throw new Exception('Attributes must be an array');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get Attributes
+     *
+     * @throws Exception
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function getFieldAttributes()
+    {
+        return $this->fieldAttributes;
+    }
+
+    /**
+     * Set Error
+     *
+     * Adds an error message to an array of errors
+     *
+     * @param string $errorName The error name
+     * @param string $messageContent The content for error message
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setErrorMessage($errorName, $messageContent)
+    {
+        $this->errorMessages[$errorName] = $messageContent;
+
+        return $this;
+    }
+
+    /**
+     * Get Error
+     *
+     * Adds an error message to an array of errors
+     *
+     * @param string $messageName Error name
      *
      * @access public
      * @since Method available since Release 1.0.0
      * @return string
      */
-    public function getLabel(){
 
-        return $this->label;
+    public function getErrorMessage($messageName)
+    {
+        return $this->errorMessages[$messageName];
+    }
+
+    /**
+     * Set partial
+     *
+     * @param string $partial The partial name
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setPartial($partial)
+    {
+        $this->partial = $partial;
+
+        return $this;
+    }
+
+    /**
+     * Get partial
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return string
+     */
+
+    public function getPartial()
+    {
+        return $this->partial;
+    }
+
+    /**
+     * Set partial
+     *
+     * @param string $name The helper name
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setHelper($name)
+    {
+        $this->helper = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get helper
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return string
+     */
+
+    public function getHelper()
+    {
+        return $this->helper;
+    }
+
+    /**
+     * Set field name
+     *
+     * @param string $name The field name
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get field name
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return string
+     */
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set field value
+     *
+     *
+     * @param string $value The field name
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get field value
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return string
+     */
+
+    public function getValue()
+    {
+        return $this->value;
     }
 
     /**
      * Validate
      *
-     * Abstract class for field falidation
+     * Abstract class for field validation
      *
      * @param string $value The content for error message
      *

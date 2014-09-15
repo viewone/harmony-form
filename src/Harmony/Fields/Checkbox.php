@@ -6,7 +6,7 @@
  *
  * This file is part Harmony-Form
  *
- * Checkbox class is responsible for service form checkbox field elements.
+ * Select class is responsible for service form select field elements.
  *
  * @category  Harmony
  * @package   Harmony-Form
@@ -19,31 +19,34 @@
 namespace Harmony\Fields;
 
 use Harmony\Field;
+use Exception;
 
-class Select extends Field
+class Checkbox extends Field
 {
+
     /**
      * Select option array
      *
-     * @var string
+     * @var array
      */
-    public $options = array();
+    public $values = array();
 
     /**
      * Form constructor
      *
-     * @param array $attributes Field attributes
+     * @param array $fieldData Field attributes
      *
      * @access public
      * @since Method available since Release 1.0.0
      */
-    public function __construct($attributes)
+    public function __construct($fieldData)
     {
-        $this->name = $attributes['name'];
-        $this->attributes = $attributes;
+        parent::__construct($fieldData);
 
         $this->validate($this->value);
-        $this->setOptions($this->attributes);
+
+        $this->partial  = "checkbox";
+        $this->helper   = 'html';
     }
 
     /**
@@ -56,13 +59,32 @@ class Select extends Field
      * @since Method available since Release 1.0.0
      * @return array
      */
-    public function setOptions($attributes){
-
-        if(array_key_exists('options', $attributes)){
-            $this->options = $attributes['options'];
+    public function setValues(array $attributes)
+    {
+        if (is_array($attributes)) {
+            if (array_key_exists('values', $attributes)) {
+                $this->values = $attributes['values'];
+            } else {
+                $this->values = $attributes;
+            }
         } else {
             throw new Exception('No options for select field');
         }
+    }
+
+    /**
+     * Get select values
+     *
+     * @param string $value Field attributes
+     * @throws
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return array
+     */
+    public function getValues($value)
+    {
+        return $this->values[$value];
     }
 
     /**

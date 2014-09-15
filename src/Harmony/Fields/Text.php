@@ -26,19 +26,19 @@ class Text extends Field
     /**
      * Form constructor
      *
-     * @param array $attributes Field attributes
+     * @param array $fieldData Field attributes
      *
      * @access public
      * @since Method available since Release 1.0.0
      */
-    public function __construct($attributes)
+    public function __construct($fieldData)
     {
-        $this->name = $attributes['name'];
-        $this->type = 'text';
-        $this->attributes = $attributes;
 
-        $this->validate($this->value);
-        $this->setLabel($this->attributes);
+        parent::__construct($fieldData);
+
+        $this->partial  = "input";
+        $this->helper   = 'html';
+
     }
 
     /**

@@ -19,38 +19,40 @@
 namespace Harmony\Fields;
 
 use Harmony\Field;
+use Exception;
 
 class Select extends Field
 {
-    /**
-     * Select option array
-     *
-     * @var string
-     */
-    public $options = array();
 
     /**
      * Select option array
      *
+     * @var array
+     */
+    public $values = array();
+
+    /**
+     * Default select value
+     *
      * @var string
      */
-    public $defaultOption = array();
+    public $emptyValue = null;
+
 
     /**
      * Form constructor
      *
-     * @param array $attributes Field attributes
+     * @param array $fieldData Field attributes
      *
      * @access public
      * @since Method available since Release 1.0.0
      */
-    public function __construct($attributes)
+    public function __construct($fieldData)
     {
-        $this->name = $attributes['name'];
-        $this->attributes = $attributes;
+        parent::__construct($fieldData);
 
-        $this->validate($this->value);
-        $this->setOptions($this->attributes);
+        $this->partial  = "select";
+        $this->helper   = 'html';
     }
 
     /**
@@ -63,39 +65,67 @@ class Select extends Field
      * @since Method available since Release 1.0.0
      * @return array
      */
-    public function setOptions($attributes){
-
-        if(array_key_exists('options', $attributes)){
-            if(array_key_exists('optionValues', $attributes['options'])){
-                $this->$defaultOption = $attributes['options']['optionValues'];
+    public function setValues(array $attributes)
+    {
+        if (is_array($attributes)) {
+            if (array_key_exists('values', $attributes)) {
+                $this->values = $attributes['values'];
+            } else {
+                $this->values = $attributes;
             }
-
         } else {
             throw new Exception('No options for select field');
         }
     }
 
     /**
-     * Set select empty options
+     * Get select values
      *
-     * @param array $attributes Field attributes
+     * @param string $value Field attributes
      * @throws
      *
      * @access public
      * @since Method available since Release 1.0.0
      * @return array
      */
-    public function setEmptyOption($attributes){
-        if(array_key_exists('options', $attributes)){
-            if(array_key_exists('defaultValue', $attributes['options'])){
-                $this->options = $attributes['options']['defaultValue'];
-            }
+    public function getValues($value)
+    {
+        return $this->values[$value];
+    }
 
-        } else {
-            throw new Exception('No options for select field');
+    /**
+     * Set select empty options
+     *
+     * @param string|array $emptyValue Field attributes
+     * @throws
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return void
+     */
+    public function setEmptyValue($emptyValue)
+    {
+        if (is_array($emptyValue)) {
+            if (array_key_exists('emptyValue', $emptyValue)) {
+                $this->emptyValue = $emptyValue['emptyValue'];
+            }
+        } elseif (is_string($emptyValue)) {
+
+            $this->emptyValue = $emptyValue;
         }
     }
 
+    /**
+     * Get select empty options
+     *
+     * @access public
+     * @since Method available since Release 1.0.0
+     * @return string
+     */
+    public function getEmptyValue()
+    {
+        return $this->emptyValue;
+    }
 
     /**
      * Form field validate

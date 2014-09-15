@@ -40,5 +40,13 @@ class FormSpec extends ObjectBehavior
         $this->shouldThrow(new \Exception("Class Text2 doesn`t exists"))->during('addField', array(array('type'=>'text2', 'name' => 'test')));
     }
 
+    function it_throw_exception_when_field_name_does_not_exist()
+    {
+        $this->shouldThrow(new \Exception("Parameter \"name\" is empty or doesn`t exists"))->during('addField', array(array('type' => 'text')));
+    }
+
+
+
+
 
 }
